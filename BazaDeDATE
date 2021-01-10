@@ -1,0 +1,324 @@
+#include<iostream>
+using namespace std;
+#include<string>
+#include <fstream>
+
+class Inregistrare
+{
+	int nrColoane;
+	int* inregistrare;
+
+public:
+
+	Inregistrare(int nrColoane, int* inregistrare)
+	{
+		this->nrColoane = nrColoane;
+		if (inregistrare != NULL)
+		{
+			this->inregistrare = new int[this->nrColoane];
+			for (int i = 0;i < this->nrColoane;i++)
+				this->inregistrare[i] = inregistrare[i];
+		}
+
+
+	}
+
+
+	friend ostream&operator<<(ostream&o, Inregistrare&s)
+	{
+		if (s.inregistrare != NULL)
+		{
+			for (int i = 0;i < s.nrColoane;i++)
+				o << s.inregistrare[i] << '\t' << '\t';
+			o << endl;
+		}
+
+
+		return o;
+
+	}
+
+
+
+	void ScriereFisier(ofstream& f)
+	{
+		f.write((char*)&nrColoane, sizeof(nrColoane));
+		for (int i = 0;i < nrColoane;i++)
+		{
+			f.write((char*)&inregistrare[i], sizeof(inregistrare[i]));
+		}
+
+
+
+}
+
+	void CitireFisier(ifstream&f)
+	{
+		delete[]inregistrare;
+		f.read((char*)&nrColoane, sizeof(nrColoane));
+		for (int i = 0;i < nrColoane;i++)
+		{
+			f.read((char*)&inregistrare[i], sizeof(inregistrare[i]));
+		}
+
+
+
+	}
+
+
+
+
+
+
+
+
+
+
+
+};
+
+
+
+class Coloane
+{
+	string Nume;
+	string Tip;
+	int Dimensiune;
+
+public:
+	Coloane(string Nume, string Tip, int Dimensiune)
+	{
+		this->Nume = Nume;
+		this->Tip = Tip;
+		this->Dimensiune = Dimensiune;
+	}
+
+
+	friend ostream&operator<<(ostream&o, Coloane&s)
+	{
+		o << s.Nume;
+		return o;
+	}
+
+
+
+
+
+
+
+
+
+
+};
+
+
+
+class Tabele
+{
+	string Nume;
+	int nrColoane;
+	int NrInregistrari;
+	Coloane** coloane;
+	Inregistrare** inregistrari;
+
+public:
+
+	Tabele()
+	{
+		this->Nume = "Table0";
+		this->nrColoane = 0;
+		this->NrInregistrari = 0;
+		this->coloane = NULL;
+		this->inregistrari = NULL;
+	}
+
+
+	Tabele(string Nume, int nrColoane, Coloane** coloane)
+	{
+		this->Nume = Nume;
+		this->nrColoane = nrColoane;
+		this->NrInregistrari = 0;
+		if (coloane != NULL)
+		{
+			this->coloane = new Coloane*[this->nrColoane];
+			this->inregistrari = new Inregistrare*[this->NrInregistrari];
+			for (int i = 0;i < this->nrColoane;i++)
+				this->coloane[i] = new Coloane(*coloane[i]);
+
+		}
+		else this->coloane = NULL;
+
+	}
+
+	friend ostream&operator<<(ostream&o, Tabele&s)
+	{
+		o << "Tabela: " << s.Nume << endl;
+		o << "Nr coloane: " << s.nrColoane << endl;
+		o << "Nr inregistrari: " << s.NrInregistrari << endl;
+		if (s.coloane != NULL)
+		{
+			for (int i = 0;i < s.nrColoane;i++)
+				o << *s.coloane[i] << "||";
+			o << endl;
+
+			for (int j = 0;j < s.nrColoane;j++)
+				o << *s.inregistrari[j] << endl;
+
+
+
+		}
+		else o << "tabela goala";
+		return o;
+	}
+
+	void insert(Inregistrare inregistrare)
+	{
+		this->NrInregistrari += 1;
+		Inregistrare** newInregistrari = new Inregistrare*[this->NrInregistrari];
+		for (int i = 0;i < this->NrInregistrari - 1;i++)
+			newInregistrari[i] = this->inregistrari[i];
+		newInregistrari[this->NrInregistrari - 1] = new Inregistrare(inregistrare);
+		delete[]this->inregistrari;
+		this->inregistrari = newInregistrari;
+	}
+
+
+	void CreateTable(string Nume, int nrColoane, Coloane** coloane)
+	{
+		this->Nume = Nume;
+		this->nrColoane = nrColoane;
+		this->NrInregistrari = 0;
+		if (coloane != NULL)
+		{
+			this->coloane = new Coloane*[this->nrColoane];
+			this->inregistrari = new Inregistrare*[this->NrInregistrari];
+			for (int i = 0;i < this->nrColoane;i++)
+				this->coloane[i] = new Coloane(*coloane[i]);
+
+		}
+		else this->coloane = NULL;
+
+
+
+
+	}
+
+
+	Coloane getColoana()
+	{
+		return **coloane;
+
+	}
+
+	Inregistrare getInregistrare()
+	{
+		return **inregistrari;
+	}
+
+
+
+	
+
+
+
+
+};
+
+
+
+class Cheltuieli :public Tabele
+{
+	string tip;
+public:
+	Cheltuieli(string tip, string nume,int nrColoane,Coloane** coloane) :Tabele(nume,nrColoane,coloane)
+	{
+		this->tip;
+
+
+
+
+	}
+
+
+
+};
+
+
+
+class VenituriFamilie :public Tabele
+{
+	string membru;
+public:
+	VenituriFamilie(string numeMembru, string nume, int nrColoane, Coloane** coloane) :Tabele(nume, nrColoane, coloane)
+	{
+		this->membru = numeMembru;
+
+	}
+
+
+
+
+
+
+
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+int main()
+{
+
+
+	Coloane** CheltuieliAlimentare = new Coloane*[3];
+
+	Coloane cheltuieliMancare("Hrana", "number", 5);
+	Coloane cheltuieliIngrijirePersonala("Ingrjire Personala", "number", 10);
+	Coloane cheltuieliCuratenie("Produse Curatenie", "number", 10);
+	CheltuieliAlimentare[0] = new Coloane(cheltuieliMancare);
+	CheltuieliAlimentare[1] = new Coloane(cheltuieliIngrijirePersonala);
+	CheltuieliAlimentare[2] = new Coloane(cheltuieliCuratenie);
+
+
+	Cheltuieli c1("alimentare", "CheltuieliAlimentare", 3, CheltuieliAlimentare);
+	int a[] = { 400,200,150 };
+	Inregistrare a1(3, a);
+	int b[] = { 320,190,160 };
+	Inregistrare b1(3, b);
+	c1.insert(a1);
+	c1.insert(b1);
+	cout << c1;
+	Tabele v;
+
+
+	Coloane** VenituriFamilie = new Coloane*[2];
+
+	Coloane VenituriSot("Sot", "number", 5);
+	Coloane VenituriSotie("Sotie", "number", 10);
+	VenituriFamilie[0] = new Coloane(VenituriSot);
+	VenituriFamilie[1] = new Coloane(VenituriSotie);
+
+
+
+
+
+	v.CreateTable("Venituri Familie", 2, VenituriFamilie);
+	int d[] = { 5000,3500 };
+	Inregistrare d1(2, d);
+	v.insert(d1);
+	cout << v;
+
+
+	return 0;
+};
